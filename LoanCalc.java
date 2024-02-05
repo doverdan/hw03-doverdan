@@ -1,91 +1,96 @@
 /**
-* Computes the periodical payment necessary to re-pay a given loan.
-*/
+ * Computes the periodical payment necessary to re-pay a given loan.
+ */
 public class LoanCalc {
-	
-	static double epsilon = 0.001;  // The computation tolerance (estimation error)
-	static int iterationCounter;    // Monitors the efficiency of the calculation
-	
-    /** 
-     * Gets the loan data and computes the periodical payment.
-     * Expects to get three command-line arguments: sum of the loan (double),
-     * interest rate (double, as a percentage), and number of payments (int).  
-     */
-	public static void main(String[] args) {		
+
+	static double epsilon = 0.001; // The computation tolerance (estimation error)
+	static int iterationCounter; // Monitors the efficiency of the calculation
+
+	/**
+	 * Gets the loan data and computes the periodical payment.
+	 * Expects to get three command-line arguments: sum of the loan (double),
+	 * interest rate (double, as a percentage), and number of payments (int).
+	 */
+	public static void main(String[] args) {
 		// Gets the loan data
+
 		double loan = Double.parseDouble(args[0]);
 		double rate = Double.parseDouble(args[1]);
 		int n = Integer.parseInt(args[2]);
-		System.out.println("Loan sum = " + loan + ", interest rate = " + rate + "%, periods = " + n);
-		
+		System.out.println(
+				"Loan sum = " + loan + ", interest rate = " + rate + "%, periods = " + n);
+
 		// Computes the periodical payment using brute force search
 		System.out.print("Periodical payment, using brute force: ");
-		System.out.printf("%.2f", bruteForceSolver(loan, rate, n, epsilon));
+		System.out.println(bruteForceSolver(loan, rate, n, epsilon));
 		System.out.println();
 		System.out.println("number of iterations: " + iterationCounter);
 
 		// Computes the periodical payment using bisection search
-		System.out.print("Periodical payment, using bi-section search: ");
-		System.out.printf("%.2f", bisectionSolver(loan, rate, n, epsilon));
-		System.out.println();
-		System.out.println("number of iterations: " + iterationCounter);
+		// System.out.print("Periodical payment, using bi-section search: ");
+		// System.out.printf("%.2f", bisectionSolver(loan, rate, n, epsilon));
+		// System.out.println();
+		// System.out.println("number of iterations: " + iterationCounter);
 	}
-	
-	/**
-	* Uses a sequential search method  ("brute force") to compute an approximation
-	* of the periodical payment that will bring the ending balance of a loan close to 0.
-	* Given: the sum of the loan, the periodical interest rate (as a percentage),
-	* the number of periods (n), and epsilon, a tolerance level.
-	*/
-	// Side effect: modifies the class variable iterationCounter.
-    public static double bruteForceSolver(double loan, double rate, int n, double epsilon) {  
-    	// Replace the following statement with your code
-		double g = loan/n;
-	    double increment = 0.0001;
-		while(!(loan<epsilon && loan>-epsilon)) {
-			loan = endBalance(loan, rate, n, g);
-			g = g + increment;
-			iterationCounter++;
 
-		}
-    	return g;
-    }
-    
-    /**
-	* Uses bisection search to compute an approximation of the periodical payment 
-	* that will bring the ending balance of a loan close to 0.
-	* Given: the sum of theloan, the periodical interest rate (as a percentage),
-	* the number of periods (n), and epsilon, a tolerance level.
-	*/
-	// Side effect: modifies the class variable iterationCounter.
-    public static double bisectionSolver(double loan, double rate, int n, double epsilon) {  
-    iterationCounter = 0;
-	double low = 0;	
-	double high = loan/n;
-	double g = (low+high)/2;
-	while(!(loan<epsilon && loan>-epsilon)) {
-		loan = endBalance(loan, rate, n, g);
-		if(loan > epsilon) {	
-			high = g;
-			g = (low+high)/2;
-		}
-    	return 0;
-    }
-	
 	/**
-	* Computes the ending balance of a loan, given the sum of the loan, the periodical
-	* interest rate (as a percentage), the number of periods (n), and the periodical payment.
-	*/
-	private static double endBalance(double loan, double rate, int n, double payment) {
-		for(int i = 0; i<n; i++) {
-			loan = loan * (1 + rate/100) - payment;
+	 * Uses a sequential search method ("brute force") to compute an approximation
+	 * of the periodical payment that will bring the ending balance of a loan close
+	 * to 0.
+	 * Given: the sum of the loan, the periodical interest rate (as a percentage),
+	 * the number of periods (n), and epsilon, a tolerance level.
+	 */
+	// Side effect: modifies the class variable iterationCounter.
+	public static double bruteForceSolver(double loan, double rate, int n, double epsilon) {
+		iterationCounter = 0;
+		double g = loan / n;
+		double increment = epsilon;
+		double balance = endBalance(loan, rate, n, g);
+		while (balance > epsilon) {
+			g = g + increment;
+			balance = endBalance(loan, rate, n, g);
 			iterationCounter++;
-			if(loan < 0) {
-				break;
+		}
+		return g;
+	}
+
+	/**
+	 * Uses bisection search to compute an approximation of the periodical payment
+	 * that will bring the ending balance of a loan close to 0.
+	 * Given: the sum of theloan, the periodical interest rate (as a percentage),
+	 * the number of periods (n), and epsilon, a tolerance level.
+	 */
+	// Side effect: modifies the class variable iterationCounter.
+	public static double bisectionSolver(double loan, double rate, int n, double epsilon) {
+		iterationCounter = 0;
+		double low = 0;
+		double high = loan / n;
+		double g = (low + high) / 2;
+		while (!(loan < epsilon && loan > -epsilon)) {
+			loan = endBalance(loan, rate, n, g);
+			System.out.println(endBalance(loan, rate, n, n));
+			if (loan > epsilon) {
+				high = g;
+				g = (low + high) / 2;
 			}
-			System.out.println(iterationCounter);	
-		}	
-		// Replace the following statement with your code
-    	return loan;
+			// return 0;
+		}
+		return g;
+	}
+
+	/**
+	 * Computes the ending balance of a loan, given the sum of the loan, the
+	 * periodical
+	 * interest rate (as a percentage), the number of periods (n), and the
+	 * periodical payment.
+	 */
+	private static double endBalance(double loan, double rate, int n, double payment) {
+		double balance = loan;
+		while (n > 0) {
+			balance = (balance - payment) * (1 + rate / 100);
+			n--;
+		}
+		return balance;
+
 	}
 }
