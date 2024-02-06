@@ -10,22 +10,16 @@ public class Calendar {
     public static void main(String args[]) {
 
         int ChosenYear = Integer.parseInt(args[0]);
-        while (year < ChosenYear) {
-            if (dayOfWeek == 1) {
-                System.out.println(dayOfMonth + "/" + month + "/" + year + " Sunday");
-            } else {
-                System.out.println(dayOfMonth + "/" + month + "/" + year);
-            }
+        while (year <= ChosenYear) {
             advance();
+            if (year == ChosenYear) {
+                if (dayOfWeek == 1) {
+                    System.out.println(dayOfMonth + "/" + month + "/" + year + " Sunday");
+                } else {
+                    System.out.println(dayOfMonth + "/" + month + "/" + year);
+                }
 
-        }
-        while (year == ChosenYear) {
-            if (dayOfWeek == 1) {
-                System.out.println(dayOfMonth + "/" + month + "/" + year + " Sunday");
-            } else {
-                System.out.println(dayOfMonth + "/" + month + "/" + year);
             }
-            advance();
         }
 
     }
